@@ -146,3 +146,5 @@ dist
 #!! ERROR: typescript is undefined. Use list command to see defined gitignore types !!#
 
 # End of https://www.toptal.com/developers/gitignore/api/node,express,typescript
+
+/generated/prisma
