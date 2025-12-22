@@ -116,19 +116,19 @@ export const makeRevision = async (req: Request, res: Response) => {
 
     const code = codeGenerationResponse.choices[0].message.content || '';
 
-    if(!code){
+    if (!code) {
       await prisma.conversation.create({
-      data: {
-        role: 'assistant',
-        content: "Unable to generate code, Please try again.",
-        projectId
-      }
-    })
-    await prisma.user.update({
-      where: { id: userId },
-      data: { credits: { increment: 5 } }
-    })
-    return;
+        data: {
+          role: 'assistant',
+          content: "Unable to generate code, Please try again.",
+          projectId
+        }
+      })
+      await prisma.user.update({
+        where: { id: userId },
+        data: { credits: { increment: 5 } }
+      })
+      return;
     }
 
     const version = await prisma.version.create({
@@ -317,7 +317,7 @@ export const saveProjectCode = async (req: Request, res: Response) => {
   try {
     const userId = req.userId;
     const { projectId } = req.params;
-    const code = req.body;
+    const { code } = req.body;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" })
