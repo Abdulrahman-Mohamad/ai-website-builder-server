@@ -8,11 +8,20 @@ import projectRouter from './routes/projectRoutes.js';
 
 const app = express();
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: '*' }));
+const corsOptions = {
+  origin: process.env.TRUSTED_ORIGIN?.split(',').map(o => o.trim().replace(/\/$/, '')) || [],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-better-auth-antiforgery"],
+  credentials: true,
+}
 
-app.all('/api/auth/{*any}', toNodeHandler(auth));
+app.use(cors(corsOptions))
+
+app.all(/\/api\/auth\/.*/, (req, res) => {
+  return toNodeHandler(auth)(req, res);
+});
 
 app.use(express.json({ limit: '50mb' }))
 
