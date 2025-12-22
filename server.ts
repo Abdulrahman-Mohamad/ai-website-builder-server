@@ -11,13 +11,15 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
-  origin: process.env.TRUSTED_ORIGIN?.split(',') || [],
+  origin: process.env.TRUSTED_ORIGIN?.split(',').map(o => o.trim()) || [],
   credentials: true,
 }
 
 app.use(cors(corsOptions))
 
-app.all('/api/auth/*', toNodeHandler(auth));
+app.all('/api/auth/:path*', (req, res) => {
+  return toNodeHandler(auth)(req, res);
+});
 
 app.use(express.json({ limit: '50mb' }))
 
