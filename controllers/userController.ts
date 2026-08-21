@@ -72,7 +72,7 @@ export const createUserProject = async (req: Request, res: Response) => {
       try {
         // Enhance user prompt
         const promptEnhanceResponse = await openai.chat.completions.create({
-          model: "kwaipilot/kat-coder-pro:free",
+          model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
           messages: [
             {
               role: "system",
@@ -115,7 +115,7 @@ export const createUserProject = async (req: Request, res: Response) => {
 
         // Generate website code
         const codeGenerationResponse = await openai.chat.completions.create({
-          model: "kwaipilot/kat-coder-pro:free",
+          model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
           messages: [
             {
               role: 'system',
