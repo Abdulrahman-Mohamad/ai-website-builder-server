@@ -48,44 +48,9 @@ export const makeRevision = async (req: Request, res: Response) => {
       data: { credits: { decrement: 5 } }
     })
 
-    res.json({ message: "Revision started" });
-
     // Execute background AI revision generation using Vercel waitUntil
     waitUntil((async () => {
       try {
-        // Enhance user prompt
-        const promptEnhanceResponse = await openai.chat.completions.create({
-          model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
-          messages: [
-            {
-              role: "system",
-              content: `You are a prompt enhancement specialist. The user wants to make changes to their website. Enhance their request to be more specific and actionable for a web developer.
-
-              Enhance this by:
-              1. Being specific about what elements to change
-              2. Mentioning design details (colors, spacing, sizes)
-              3. Clarifying the desired outcome
-              4. Using clear technical terms
-
-              Return ONLY the enhanced request, nothing else. Keep it concise (1-2 sentences).`
-            },
-            {
-              role: "user",
-              content: `User's request: ${message}`
-            }
-          ]
-        })
-
-        const enhancedPrompt = promptEnhanceResponse?.choices?.[0]?.message?.content || message;
-
-        await prisma.conversation.create({
-          data: {
-            role: 'assistant',
-            content: `I've enhanced your prompt to: ${enhancedPrompt}`,
-            projectId
-          }
-        })
-
         await prisma.conversation.create({
           data: {
             role: 'assistant',
@@ -101,7 +66,8 @@ export const makeRevision = async (req: Request, res: Response) => {
             {
               role: "system",
               content: `
-              You are an expert web developer. 
+              You are an expert web developer and revision specialist.
+              Analyze the user's requested changes, enhance their vision (clarifying specific layout, spacing, colors, and components to adjust), and apply those enhancements directly into the code.
 
               CRITICAL REQUIREMENTS:
               - Return ONLY the complete updated HTML code with the requested changes.
@@ -115,7 +81,7 @@ export const makeRevision = async (req: Request, res: Response) => {
             },
             {
               role: "user",
-              content: `Here is the current website code: "${currentProject?.current_code}" The user wants this changes: "${enhancedPrompt}"`
+              content: `Here is the current website code: "${currentProject?.current_code}". The user requested these changes: "${message}"`
             }
           ]
         })

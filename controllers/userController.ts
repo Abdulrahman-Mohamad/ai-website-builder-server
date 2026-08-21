@@ -71,41 +71,6 @@ export const createUserProject = async (req: Request, res: Response) => {
     // Execute background AI generation
     waitUntil((async () => {
       try {
-        // Enhance user prompt
-        const promptEnhanceResponse = await openai.chat.completions.create({
-          model: process.env.AI_MODEL || "meta-llama/llama-3.3-70b-instruct:free",
-          messages: [
-            {
-              role: "system",
-              content: `
-              You are a prompt enhancement specialist. Take the user's website request and expand it into a detailed, comprehensive prompt that will help create the best possible website.
-
-              Enhance this prompt by:
-              1. Adding specific design details (layout, color scheme, typography)
-              2. Specifying key sections and features
-              3. Describing the user experience and interactions
-              4. Including modern web design best practices
-              5. Mentioning responsive design requirements
-              6. Adding any missing but important elements
-
-              Return ONLY the enhanced prompt, nothing else. Make it detailed but concise (2-3 paragraphs max).`
-            },
-            {
-              role: "user",
-              content: initial_prompt
-            }
-          ]
-        })
-
-        const enhancedPrompt = promptEnhanceResponse?.choices?.[0]?.message?.content || initial_prompt;
-
-        await prisma.conversation.create({
-          data: {
-            role: "assistant",
-            content: `I've enhanced your prompt to: ${enhancedPrompt}`,
-            projectId: project.id
-          }
-        })
         await prisma.conversation.create({
           data: {
             role: "assistant",
@@ -121,7 +86,13 @@ export const createUserProject = async (req: Request, res: Response) => {
             {
               role: 'system',
               content: `
-              You are an expert web developer. Create a complete, production-ready, single-page website based on this request: "${enhancedPrompt}"
+              You are an expert web developer and prompt enhancement specialist. 
+              First, conceptualize and enhance the user's request by:
+              1. Adding rich design details (modern layout, harmonious color palette, typography)
+              2. Expanding key sections, components, interactive features, and responsive design
+              3. Applying modern web UX best practices
+
+              Then, directly output a complete, production-ready, single-page website based on that enhanced vision.
 
               CRITICAL REQUIREMENTS:
               - You MUST output valid HTML ONLY. 
@@ -148,7 +119,7 @@ export const createUserProject = async (req: Request, res: Response) => {
             },
             {
               role: 'user',
-              content: enhancedPrompt || ''
+              content: initial_prompt
             }
           ]
         })
