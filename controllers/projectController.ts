@@ -76,7 +76,7 @@ export const makeRevision = async (req: Request, res: Response) => {
           ]
         })
 
-        const enhancedPrompt = promptEnhanceResponse.choices[0].message.content;
+        const enhancedPrompt = promptEnhanceResponse?.choices?.[0]?.message?.content || message;
 
         await prisma.conversation.create({
           data: {
@@ -120,7 +120,7 @@ export const makeRevision = async (req: Request, res: Response) => {
           ]
         })
 
-        const code = codeGenerationResponse.choices[0].message.content || '';
+        const code = codeGenerationResponse?.choices?.[0]?.message?.content || '';
 
         if (!code) {
           await prisma.conversation.create({
