@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { waitUntil } from "@vercel/functions";
 import prisma from "../lib/prisma.js";
 import openai from "../configs/openai.js";
 
@@ -68,7 +69,7 @@ export const createUserProject = async (req: Request, res: Response) => {
     res.json({ projectId: project.id });
 
     // Execute background AI generation
-    (async () => {
+    waitUntil((async () => {
       try {
         // Enhance user prompt
         const promptEnhanceResponse = await openai.chat.completions.create({
@@ -204,7 +205,7 @@ export const createUserProject = async (req: Request, res: Response) => {
           data: { credits: { increment: 5 } }
         });
       }
-    })();
+    })());
 
 
   } catch (error: any) {
